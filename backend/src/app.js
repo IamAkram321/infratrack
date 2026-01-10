@@ -1,7 +1,8 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
 
+const connectDB = require("./config/db");
 const issueRoutes = require("./routes/issueRoutes");
 
 const app = express();
@@ -9,12 +10,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", message: "InfraTrack backend running" });
 });
 
-// api routes
+
+connectDB();
+
+
 app.use("/api/issues", issueRoutes);
 
 const PORT = process.env.PORT || 5000;
