@@ -1,22 +1,43 @@
-const getAllIssues = (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: [],
-    message: "List of infrastructure issues (placeholder)",
-  });
+const Issue = require("../models/Issue");
+
+// GET /api/issues
+const getAllIssues = async (req, res) => {
+  try {
+    const issues = await Issue.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: issues,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch issues",
+    });
+  }
 };
 
-const createIssue = (req, res) => {
-  const { type, location } = req.body;
+// POST /api/issues
+const createIssue = async (req, res) => {
+  try {
+    const { type, location } = req.body;
 
-  res.status(201).json({
-    success: true,
-    message: "Issue reported successfully (placeholder)",
-    data: {
+    const issue = await Issue.create({
       type,
       location,
-    },
-  });
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Issue reported successfully",
+      data: issue,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to report issue",
+    });
+  }
 };
 
 module.exports = {
