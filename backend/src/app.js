@@ -4,6 +4,8 @@ const cors = require("cors");
 
 const connectDB = require("./config/db");
 const issueRoutes = require("./routes/issueRoutes");
+const errorHandler = require("./middlewares/errorHandler");
+
 
 const app = express();
 
@@ -19,6 +21,8 @@ connectDB();
 
 
 app.use("/api/issues", issueRoutes);
+app.use(errorHandler);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

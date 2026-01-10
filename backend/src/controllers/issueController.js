@@ -1,7 +1,7 @@
 const Issue = require("../models/Issue");
 
 // GET /api/issues
-const getAllIssues = async (req, res) => {
+const getAllIssues = async (req, res, next) => {
   try {
     const issues = await Issue.find().sort({ createdAt: -1 });
 
@@ -10,17 +10,22 @@ const getAllIssues = async (req, res) => {
       data: issues,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch issues",
-    });
+    next(error);
   }
 };
 
 // POST /api/issues
-const createIssue = async (req, res) => {
+const createIssue = async (req, res, next) => {
   try {
     const { type, location } = req.body;
+
+    // validation
+    if (!type || !location) {
+      return res.status(400).json({
+        success: false,
+        message: "Type and location are required",
+      });
+    }
 
     const issue = await Issue.create({
       type,
@@ -33,10 +38,7 @@ const createIssue = async (req, res) => {
       data: issue,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to report issue",
-    });
+    next(error);
   }
 };
 
