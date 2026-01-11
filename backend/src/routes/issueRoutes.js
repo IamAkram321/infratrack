@@ -4,12 +4,11 @@ const router = express.Router();
 const {
   getAllIssues,
   createIssue,
+  updateIssueStatus,
 } = require("../controllers/issueController");
 
-// GET /api/issues
 router.get("/", getAllIssues);
-
-// POST /api/issues
 router.post("/", createIssue);
+router.patch("/:id/status", updateIssueStatus);
 
 module.exports = router;
