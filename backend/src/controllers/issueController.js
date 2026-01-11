@@ -19,7 +19,6 @@ const createIssue = async (req, res, next) => {
   try {
     const { type, location } = req.body;
 
-    // validation
     if (!type || !location) {
       return res.status(400).json({
         success: false,
@@ -27,10 +26,27 @@ const createIssue = async (req, res, next) => {
       });
     }
 
-    const issue = await Issue.create({
+    // duplicate detection window (last 24 hours)
+    const twentyFourHoursAgo = new Date(
+      Date.now() - 24 * 60 * 60 * 1000
+    );
+
+    const existingIssue = await Issue.findOne({
       type,
       location,
+      status: { $ne: "fixed" },
+      createdAt: { $gte: twentyFourHoursAgo },
     });
+
+    if (existingIssue) {
+      return res.status(409).json({
+        success: false,
+        message: "Similar issue already reported recently",
+        data: existingIssue,
+      });
+    }
+
+    const issue = await Issue.create({ type, location });
 
     res.status(201).json({
       success: true,
@@ -41,6 +57,7 @@ const createIssue = async (req, res, next) => {
     next(error);
   }
 };
+
 
 // PATCH /api/issues/:id/status
 const updateIssueStatus = async (req, res, next) => {
