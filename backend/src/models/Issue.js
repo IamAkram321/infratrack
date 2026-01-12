@@ -11,6 +11,15 @@ const issueSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    severity: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      required: true,
+    },
+    priorityScore: {
+      type: Number,
+      default: 0,
+    },
     status: {
       type: String,
       enum: ["reported", "in_progress", "fixed"],

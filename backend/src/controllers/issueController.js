@@ -1,9 +1,30 @@
 const Issue = require("../models/Issue");
 
+const getSeverityFromType = (type) => {
+  switch (type) {
+    case "electric_pole":
+    case "manhole":
+      return "high";
+    case "pothole":
+      return "medium";
+    case "streetlight":
+      return "low";
+    default:
+      return "low";
+  }
+};
+
+const severityScoreMap = {
+  low: 1,
+  medium: 2,
+  high: 3,
+};
+
 // GET /api/issues
 const getAllIssues = async (req, res, next) => {
   try {
-    const issues = await Issue.find().sort({ createdAt: -1 });
+    const issues = await Issue.find({ status: { $ne: "fixed" } })
+      .sort({ priorityScore: -1, createdAt: 1 });
 
     res.status(200).json({
       success: true,
@@ -46,7 +67,16 @@ const createIssue = async (req, res, next) => {
       });
     }
 
-    const issue = await Issue.create({ type, location });
+    //severity logic
+    const severity = getSeverityFromType(type);
+    const priorityScore = severityScoreMap[severity];
+
+    const issue = await Issue.create({
+      type,
+      location,
+      severity,
+      priorityScore,
+    });
 
     res.status(201).json({
       success: true,
@@ -57,7 +87,6 @@ const createIssue = async (req, res, next) => {
     next(error);
   }
 };
-
 
 // PATCH /api/issues/:id/status
 const updateIssueStatus = async (req, res, next) => {
@@ -96,7 +125,6 @@ const updateIssueStatus = async (req, res, next) => {
     next(error);
   }
 };
-
 
 module.exports = {
   getAllIssues,
