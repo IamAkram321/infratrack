@@ -1,9 +1,9 @@
-import ReportIssue from "./pages/ReportIssue";
+import IssueDashboard from "./pages/IssueDashboard";
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <ReportIssue />
+      <IssueDashboard />
     </div>
   );
 }
