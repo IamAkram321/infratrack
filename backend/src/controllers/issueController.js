@@ -23,17 +23,56 @@ const severityScoreMap = {
 // GET /api/issues
 const getAllIssues = async (req, res, next) => {
   try {
-    const issues = await Issue.find({ status: { $ne: "fixed" } })
-      .sort({ priorityScore: -1, createdAt: 1 });
+    let { page = 1, limit = 10, status, severity } = req.query;
+
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    // safety caps
+    if (page < 1) page = 1;
+    if (limit < 1) limit = 10;
+    if (limit > 50) limit = 50;
+
+    const filter = {};
+
+    if (status) {
+      filter.status = status;
+    }
+
+    if (severity) {
+      filter.severity = severity;
+    }
+
+    //  not showing fixed issues by default
+    if (!status) {
+      filter.status = { $ne: "fixed" };
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [issues, total] = await Promise.all([
+      Issue.find(filter)
+        .sort({ priorityScore: -1, createdAt: 1 })
+        .skip(skip)
+        .limit(limit),
+      Issue.countDocuments(filter),
+    ]);
 
     res.status(200).json({
       success: true,
+      meta: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+        limit,
+      },
       data: issues,
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 // POST /api/issues
 const createIssue = async (req, res, next) => {

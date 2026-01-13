@@ -29,4 +29,8 @@ const issueSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+issueSchema.index({ status: 1, severity: 1 });
+issueSchema.index({ priorityScore: -1, createdAt: 1 });
+
+
 module.exports = mongoose.model("Issue", issueSchema);
