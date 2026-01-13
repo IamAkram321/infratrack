@@ -18,6 +18,10 @@ function IssueDashboard() {
   const [severity, setSeverity] = useState("");
   const [status, setStatus] = useState("");
 
+  // 🔐 ROLE CHECK (KEY PART)
+  const role = localStorage.getItem("role");
+  const isAdmin = role === "admin";
+
   const queryClient = useQueryClient();
 
   // Fetch issues
@@ -33,7 +37,7 @@ function IssueDashboard() {
     keepPreviousData: true,
   });
 
-  // Update issue status mutation
+  // Update issue status mutation (ADMIN ONLY)
   const statusMutation = useMutation({
     mutationFn: updateIssueStatus,
     onSuccess: () => {
@@ -117,6 +121,7 @@ function IssueDashboard() {
 
         {issues.map((issue) => {
           const isUpdating =
+            isAdmin &&
             statusMutation.isLoading &&
             statusMutation.variables?.id === issue._id;
 
@@ -144,33 +149,43 @@ function IssueDashboard() {
                 📍 {issue.location}
               </p>
 
-              {/* Status Update */}
+              {/* STATUS SECTION */}
               <div className="mt-3 flex items-center gap-2">
                 <label className="text-sm text-gray-600">
                   Status:
                 </label>
 
-                <select
-                  value={issue.status}
-                  disabled={isUpdating}
-                  onChange={(e) =>
-                    statusMutation.mutate({
-                      id: issue._id,
-                      status: e.target.value,
-                    })
-                  }
-                  className="border px-2 py-1 rounded text-sm disabled:opacity-60"
-                >
-                  <option value="reported">Reported</option>
-                  <option value="in_progress">
-                    In Progress
-                  </option>
-                  <option value="fixed">Fixed</option>
-                </select>
+                {/* 👑 ADMIN: editable */}
+                {isAdmin ? (
+                  <>
+                    <select
+                      value={issue.status}
+                      disabled={isUpdating}
+                      onChange={(e) =>
+                        statusMutation.mutate({
+                          id: issue._id,
+                          status: e.target.value,
+                        })
+                      }
+                      className="border px-2 py-1 rounded text-sm disabled:opacity-60"
+                    >
+                      <option value="reported">Reported</option>
+                      <option value="in_progress">
+                        In Progress
+                      </option>
+                      <option value="fixed">Fixed</option>
+                    </select>
 
-                {isUpdating && (
-                  <span className="text-xs text-gray-400">
-                    Updating...
+                    {isUpdating && (
+                      <span className="text-xs text-gray-400">
+                        Updating...
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  // 👤 USER: read-only
+                  <span className="text-sm text-gray-700 capitalize">
+                    {issue.status.replace("_", " ")}
                   </span>
                 )}
               </div>
