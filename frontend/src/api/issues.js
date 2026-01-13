@@ -11,3 +11,11 @@ export const fetchIssues = async (params) => {
   });
   return response.data;
 };
+
+export const updateIssueStatus = async ({ id, status }) => {
+  const response = await apiClient.patch(
+    `/issues/${id}/status`,
+    { status }
+  );
+  return response.data;
+};
