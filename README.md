@@ -22,7 +22,7 @@ InfraTrack enables citizens to report infrastructure issues, while providing aut
 - Manage resolution workflows efficiently
 
 ---
-
+```
 ## Backend Architecture
 
 backend/
@@ -39,6 +39,7 @@ backend/
 │ └── middlewares/
 │ └── errorHandler.js # Centralized error handling
 
+```
 
 ---
 
@@ -91,4 +92,5 @@ backend/
 ```bash
 cd backend
 npm install
+
 npm run dev
