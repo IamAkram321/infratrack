@@ -7,8 +7,18 @@ const {
   updateIssueStatus,
 } = require("../controllers/issueController");
 
+const {
+  protect,
+  requireAdmin,
+} = require("../middlewares/authMiddleware");
+
+// Public
 router.get("/", getAllIssues);
-router.post("/", createIssue);
-router.patch("/:id/status", updateIssueStatus);
+
+// Authenticated users
+router.post("/", protect, createIssue);
+
+// Admin-only
+router.patch("/:id/status", protect, requireAdmin, updateIssueStatus);
 
 module.exports = router;

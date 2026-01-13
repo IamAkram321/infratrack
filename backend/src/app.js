@@ -5,6 +5,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const issueRoutes = require("./routes/issueRoutes");
 const errorHandler = require("./middlewares/errorHandler");
+const authRoutes = require("./routes/authRoutes");
 
 
 const app = express();
@@ -19,7 +20,7 @@ app.get("/health", (req, res) => {
 
 connectDB();
 
-
+app.use("/api/auth", authRoutes);
 app.use("/api/issues", issueRoutes);
 app.use(errorHandler);
 
